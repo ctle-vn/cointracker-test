@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  cointracker:
+    build:
+      context: cointracker
+      dockerfile: Dockerfile
+    command: bash -c "cd /app/cointracker && alembic upgrade head && uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload"
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    environment:
+      - PYTHONPATH=/app/cointracker
+
+  db:
+    image: postgres
+    ports:
+      - "5433:5432"
+    restart: always
+    environment:
+      POSTGRES_DB: dev_db
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
